@@ -1,5 +1,6 @@
 import React from 'react';
 import { portfolio } from '../data/portfolio';
+import { GrainOverlay } from '../components/GrainOverlay/GrainOverlay';
 import styles from './Experience.module.css';
 
 export const Experience = () => {
@@ -19,7 +20,13 @@ export const Experience = () => {
               <div className={styles.colOrg}>
                 <h3 className={styles.orgName}>{exp.organization}</h3>
                 <div className={styles.hoverImageWrapper}>
-                  <img src={`https://picsum.photos/400/200?random=${index + 10}`} alt={exp.organization} className={styles.hoverImage} />
+                  <img
+                    src={`https://picsum.photos/400/200?random=${index + 10}`}
+                    alt={exp.organization}
+                    className={styles.hoverImage}
+                    loading="lazy"
+                  />
+                  <GrainOverlay intensity="medium" />
                 </div>
               </div>
               <div className={styles.colDate}>

@@ -12,31 +12,20 @@ interface WakaLang {
 }
 
 interface WakaDailyActivity {
-  day: string;       // "Mon", "Tue", etc.
+  day: string;
   hours: number;
 }
 
-const LANG_COLORS: Record<string, string> = {
-  TypeScript: "#3178c6",
-  JavaScript: "#f7df1e",
-  Python: "#3572A5",
-  "C++": "#f34b7d",
-  CSS: "#563d7c",
-  HTML: "#e34c26",
-  Rust: "#dea584",
-  Go: "#00ADD8",
-  Java: "#b07219",
-  Kotlin: "#A97BFF",
-  C: "#555555",
-  Ruby: "#701516",
-  Lua: "#000080",
-  Shell: "#89e051",
-  Bash: "#89e051",
-  JSON: "#999999",
-  YAML: "#cb171e",
-  Markdown: "#083fa1",
-  Other: "#666666",
-};
+interface WakaTimeApiResponse {
+  ok: boolean;
+  data: {
+    languages: WakaLang[];
+    daily: WakaDailyActivity[];
+    totalTime: string;
+    rangeLabel?: string;
+    source?: string;
+  } | null;
+}
 
 const FALLBACK_LANGUAGES: WakaLang[] = [
   { name: "TypeScript", percent: 42, hours: 21, minutes: 14, color: "#3178c6" },
@@ -65,67 +54,21 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
   const [languages, setLanguages] = useState<WakaLang[]>([]);
   const [daily, setDaily] = useState<WakaDailyActivity[]>([]);
   const [totalTime, setTotalTime] = useState("");
+  const [rangeLabel, setRangeLabel] = useState("Last 7 days");
 
   useEffect(() => {
     const fetchWakaTime = async () => {
       try {
-        const apiKey = import.meta.env.VITE_WAKATIME_API_KEY;
-        if (!apiKey) throw new Error("No API key");
+        const res = await fetch("/api/wakatime/stats");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        const authHeader = `Basic ${btoa(apiKey)}`;
+        const json = (await res.json()) as WakaTimeApiResponse;
+        if (!json.ok || !json.data) throw new Error("No data");
 
-        // Fetch stats (languages, total time)
-        const statsRes = await fetch(
-          "/api/wakatime/users/current/stats/last_7_days",
-          { headers: { Authorization: authHeader } }
-        );
-        if (!statsRes.ok) throw new Error(`Stats: HTTP ${statsRes.status}`);
-        const statsJson = await statsRes.json();
-        const data = statsJson.data;
-
-        // Parse languages
-        const langs: WakaLang[] = (data.languages || [])
-          .slice(0, 7)
-          .map((l: any) => ({
-            name: l.name,
-            percent: Math.round(l.percent * 100) / 100,
-            hours: l.hours,
-            minutes: l.minutes,
-            color: LANG_COLORS[l.name] || "#666666",
-          }));
-
-        const totalStr = data.human_readable_total || FALLBACK_TOTAL;
-        const dailyAvg = data.human_readable_daily_average || "";
-
-        setLanguages(langs.length > 0 ? langs : FALLBACK_LANGUAGES);
-        setTotalTime(totalStr);
-
-        // Try fetching summaries for daily breakdown
-        try {
-          const end = new Date();
-          const start = new Date();
-          start.setDate(end.getDate() - 6);
-          const fmt = (d: Date) => d.toISOString().split("T")[0];
-
-          const sumRes = await fetch(
-            `/api/wakatime/users/current/summaries?start=${fmt(start)}&end=${fmt(end)}`,
-            { headers: { Authorization: authHeader } }
-          );
-
-          if (sumRes.ok) {
-            const sumJson = await sumRes.json();
-            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            const dailyData: WakaDailyActivity[] = (sumJson.data || []).map((d: any) => ({
-              day: dayNames[new Date(d.range.date).getDay()],
-              hours: Math.round(((d.grand_total?.total_seconds || 0) / 3600) * 10) / 10,
-            }));
-            setDaily(dailyData.length > 0 ? dailyData : FALLBACK_DAILY);
-          } else {
-            setDaily(FALLBACK_DAILY);
-          }
-        } catch {
-          setDaily(FALLBACK_DAILY);
-        }
+        setLanguages(json.data.languages.length > 0 ? json.data.languages : FALLBACK_LANGUAGES);
+        setDaily(json.data.daily.length > 0 ? json.data.daily : FALLBACK_DAILY);
+        setTotalTime(json.data.totalTime || FALLBACK_TOTAL);
+        setRangeLabel(json.data.rangeLabel || "Last 7 days");
       } catch (err) {
         console.info("WakaTime: using fallback data", err);
         setLanguages(FALLBACK_LANGUAGES);
@@ -135,7 +78,10 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
         setLoading(false);
       }
     };
-    fetchWakaTime();
+
+    if (document.visibilityState !== "hidden") {
+      fetchWakaTime();
+    }
   }, []);
 
   if (loading) {
@@ -151,12 +97,10 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
 
   return (
     <div className={styles.dashboardGrid}>
-      
-      {/* LEFT: Language Breakdown — Horizontal Bar Chart */}
       <div className={styles.panel}>
         <div className={styles.panelHeader}>
           <h3 className={styles.panelTitle}>Languages</h3>
-          <span className={styles.panelMeta}>Last 7 days</span>
+          <span className={styles.panelMeta}>{rangeLabel}</span>
         </div>
 
         <div className={styles.langList}>
@@ -181,7 +125,6 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
         </div>
       </div>
 
-      {/* RIGHT: Daily Activity + Total */}
       <div className={styles.panel}>
         <div className={styles.panelHeader}>
           <h3 className={styles.panelTitle}>Activity</h3>
@@ -209,7 +152,6 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
           })}
         </div>
 
-        {/* Mini stat row */}
         <div className={styles.miniStats}>
           <div className={styles.miniStat}>
             <span className={styles.miniStatValue}>{daily.reduce((sum, d) => sum + d.hours, 0).toFixed(0)}h</span>
@@ -225,7 +167,6 @@ export const WakaTimeStats = memo(function WakaTimeStats() {
           </div>
         </div>
       </div>
-
     </div>
   );
 });

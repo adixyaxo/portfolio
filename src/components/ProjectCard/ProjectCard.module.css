@@ -22,7 +22,7 @@
 
 .placeholderImage {
   width: 100%;
-  height: 120%; /* Extra height for parallax */
+  height: 120%;
   position: absolute;
   top: -10%;
   left: 0;
@@ -38,31 +38,72 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.7;
-  transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  opacity: 0.75;
+  transition: opacity 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .link:hover .projectVideo {
-  opacity: 0; /* Fade out local video since layoutId takes over or we just want full screen */
+  opacity: 0.9;
 }
 
-.fullScreenOverlay {
+.videoBackdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 999;
-  pointer-events: none; /* Crucial to prevent hover flicker */
+  inset: 0;
+  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(4, 4, 4, 0.72);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  pointer-events: none;
 }
 
-.fullScreenVideo {
-  width: 100vw;
-  height: 100vh;
+.videoStage {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1400px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 32px 100px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+.expandedVideo {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+
+.videoCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+  z-index: 4;
+}
+
+.videoCaptionTitle {
+  font-family: var(--font-roobert);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-paper);
+}
+
+.videoCaptionHint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .content {
@@ -73,7 +114,7 @@
 
 .header {
   display: flex;
-  align-items:baseline;
+  align-items: baseline;
   gap: var(--spacing-12);
 }
 

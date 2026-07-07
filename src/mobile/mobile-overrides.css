@@ -1,0 +1,155 @@
+/* Mobile-only layout overrides — desktop styles remain untouched */
+
+@media (max-width: 768px) {
+  * {
+    cursor: auto !important;
+  }
+
+  .mobile-main {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  /* Hide desktop menu button — bottom nav handles navigation */
+  [class*="menuBtn"] {
+    display: none !important;
+  }
+
+  /* Tighter logo positioning */
+  [class*="logo"] {
+    top: 16px !important;
+    left: 20px !important;
+    font-size: 12px !important;
+  }
+
+  /* Hero — compact, no blend-mode issues on small screens */
+  [class*="hero"] {
+    min-height: 72vh !important;
+  }
+
+  [class*="titleMain"] {
+    font-size: clamp(2.4rem, 14vw, 4rem) !important;
+    mix-blend-mode: normal !important;
+  }
+
+  [class*="role"] {
+    font-size: 11px !important;
+    letter-spacing: 0.1em !important;
+    mix-blend-mode: normal !important;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  /* Intro — readable on small screens */
+  [class*="intro"] {
+    min-height: auto !important;
+    padding: 48px 24px !important;
+  }
+
+  [class*="intro"] [class*="text"] {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Work section */
+  [class*="work"] {
+    padding: 64px 20px !important;
+  }
+
+  [class*="work"] [class*="title"] {
+    font-size: 12px !important;
+  }
+
+  [class*="card"] {
+    margin-bottom: 48px !important;
+  }
+
+  [class*="card"] [class*="title"] {
+    font-size: clamp(1.4rem, 5vw, 1.8rem) !important;
+  }
+
+  [class*="description"] p {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Experience — native card stack */
+  [class*="experience"] [class*="row"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 28px 20px !important;
+  }
+
+  [class*="experience"] [class*="roleTitle"] {
+    font-size: clamp(1.3rem, 5vw, 1.6rem) !important;
+  }
+
+  [class*="experience"] [class*="hoverImageWrapper"] {
+    display: none !important;
+  }
+
+  [class*="experience"] [class*="orgName"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Skills / WakaTime */
+  [class*="skills"] {
+    padding: 48px 20px !important;
+  }
+
+  [class*="dashboardGrid"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  [class*="panel"] {
+    padding: 20px 16px !important;
+  }
+
+  [class*="langRow"] {
+    grid-template-columns: 80px 1fr 52px 36px !important;
+    gap: 8px !important;
+  }
+
+  /* Writing */
+  [class*="writing"] {
+    padding: 48px 20px !important;
+  }
+
+  /* Education */
+  [class*="education"] {
+    padding: 48px 20px !important;
+  }
+
+  /* Contact / Footer */
+  [class*="contact"] {
+    min-height: auto !important;
+  }
+
+  [class*="footerWrapper"] {
+    padding: 48px 20px calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Dynamic notch — smaller on mobile */
+  [class*="notch"] {
+    min-width: 180px !important;
+    max-width: calc(100vw - 100px) !important;
+  }
+
+  [class*="notchExpanded"] {
+    min-width: 260px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  /* Marquee — slower feel, less vertical space */
+  [class*="marquee"] {
+    padding: 16px 0 !important;
+  }
+
+  /* Rounded sections — tighter margins */
+  .roundedSection {
+    margin: 8px !important;
+    border-radius: 20px !important;
+  }
+}

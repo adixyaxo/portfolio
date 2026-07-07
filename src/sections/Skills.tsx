@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { portfolio } from '../data/portfolio';
 import { motion } from 'framer-motion';
-import { WakaTimeStats } from '../components/WakaTimeStats/WakaTimeStats';
 import styles from './Skills.module.css';
+
+const WakaTimeStats = lazy(() =>
+  import('../components/WakaTimeStats/WakaTimeStats').then((m) => ({
+    default: m.WakaTimeStats,
+  }))
+);
 
 export const Skills = () => {
   return (
@@ -48,7 +53,9 @@ export const Skills = () => {
           viewport={{ once: true, margin: "-10%" }}
           transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
         >
-          <WakaTimeStats />
+          <Suspense fallback={<div className={styles.wakaFallback} aria-hidden="true" />}>
+            <WakaTimeStats />
+          </Suspense>
         </motion.div>
       </div>
     </section>

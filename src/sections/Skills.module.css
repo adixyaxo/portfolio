@@ -73,6 +73,10 @@
   padding-top: var(--spacing-68);
 }
 
+.wakaFallback {
+  min-height: 200px;
+}
+
 @media (max-width: 768px) {
   .skills {
     padding: var(--spacing-68) var(--spacing-28);
