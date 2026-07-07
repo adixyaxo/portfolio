@@ -1,0 +1,114 @@
+.card {
+  width: 100%;
+  margin-bottom: var(--spacing-68);
+  position: relative;
+}
+
+.link {
+  display: block;
+  width: 100%;
+}
+
+.imageContainer {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--color-inkstone);
+  margin-bottom: var(--spacing-28);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 120%; /* Extra height for parallax */
+  position: absolute;
+  top: -10%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.projectVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+  transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.link:hover .projectVideo {
+  opacity: 0; /* Fade out local video since layoutId takes over or we just want full screen */
+}
+
+.fullScreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  pointer-events: none; /* Crucial to prevent hover flicker */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullScreenVideo {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.header {
+  display: flex;
+  align-items:baseline;
+  gap: var(--spacing-12);
+}
+
+.index {
+  font-family: var(--font-mono);
+  color: var(--color-felt-gray);
+  font-size: var(--text-body-sm);
+}
+
+.title {
+  font-family: var(--font-roobert);
+  font-size: var(--text-subheading);
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-8);
+  margin: var(--spacing-8) 0;
+}
+
+.description {
+  max-width: 800px;
+}
+
+.description p {
+  font-family: var(--font-roobert);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--color-ash-mist);
+  margin-bottom: var(--spacing-12);
+}
+
+.description p:last-child {
+  margin-bottom: 0;
+}

@@ -1,0 +1,32 @@
+.intro {
+  background-color: var(--color-paper);
+  color: var(--color-obsidian);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.container {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.text {
+  font-family: var(--font-playfair);
+  font-size: var(--text-heading-sm);
+  line-height: var(--leading-heading-sm);
+  font-weight: 400;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .text {
+    font-size: var(--text-subheading-lg);
+  }
+}

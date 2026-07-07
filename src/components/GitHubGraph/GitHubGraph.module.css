@@ -1,0 +1,142 @@
+.section {
+  padding: var(--spacing-48) var(--spacing-28);
+  position: relative;
+  z-index: 10;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-16);
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: #000000;
+  margin: 0;
+}
+
+.count {
+  color: #000000;
+  font-weight: 700;
+}
+
+.link {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: #000000;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.link:hover {
+  opacity: 0.7;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-40) 0;
+}
+
+.loader {
+  animation: spin 1s linear infinite;
+  color: var(--color-circuit-teal);
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.graphWrapper {
+  /* Scale down and prevent scroll */
+  width: 100%;
+  overflow: hidden;
+  padding-bottom: var(--spacing-8);
+}
+
+.months {
+  position: relative;
+  height: 16px;
+  margin-bottom: 4px;
+}
+
+.monthLabel {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #000000;
+  font-weight: 600;
+}
+
+.grid {
+  display: flex;
+  gap: 2px;
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cell {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: var(--spacing-12);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #000000;
+  font-weight: 600;
+}
+
+.legendCell {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+@media (min-width: 768px) {
+  .cell {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+  .grid {
+    gap: 3px;
+  }
+  .week {
+    gap: 3px;
+  }
+}
+
+/* On very small screens, scale the entire grid down so it doesn't scroll */
+@media (max-width: 600px) {
+  .graphWrapper {
+    transform-origin: left top;
+    transform: scale(0.8);
+    width: 125%; /* Compensate for scale to prevent cutoff */
+  }
+}

@@ -1,0 +1,85 @@
+.liquidContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #070707;
+}
+
+.liquidCanvasWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.contentOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Let clicks pass through except on children with pointer-events: auto */
+}
+
+.titleMain {
+  font-family: var(--font-roobert);
+  font-size: clamp(4rem, 10vw, 11rem);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  margin: 0 0 var(--spacing-40) 0;
+  text-transform: uppercase;
+  color: #fff;
+  text-align: center;
+}
+
+.ctaBtn {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border-radius: 40px;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.ctaBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.pauseBtn {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.pauseBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

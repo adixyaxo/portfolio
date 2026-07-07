@@ -1,0 +1,20 @@
+.revealWrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.wordContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em; /* Space between words */
+}
+
+.wordMask {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform, opacity;
+}

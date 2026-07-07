@@ -1,0 +1,225 @@
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--spacing-64);
+  width: 100%;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--spacing-40);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: var(--spacing-12);
+}
+
+.panelTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-signal-amber);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.panelMeta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-ash-mist);
+}
+
+.panelTotal {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-paper);
+  font-weight: 700;
+}
+
+/* ——— Language Bar Chart ——— */
+
+.langList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.langRow {
+  display: grid;
+  grid-template-columns: 100px 1fr 70px 48px;
+  align-items: center;
+  gap: 16px;
+}
+
+.langName {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-paper);
+  text-align: left;
+}
+
+.barTrack {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+  background: linear-gradient(90deg, #ff003c, #00f0ff, #a855f7, #ff9900, #ff003c) !important;
+  background-size: 300% 100%;
+  animation: gradientShift 6s linear infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+.langTime {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ash-mist);
+  text-align: right;
+}
+
+.langPct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-felt-gray);
+  text-align: right;
+}
+
+/* ——— Daily Activity Chart ——— */
+
+.activityChart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex: 1;
+  min-height: 200px;
+  gap: 12px;
+}
+
+.activityCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.activityBarTrack {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.activityBar {
+  width: 100%;
+  max-width: 36px;
+  background: linear-gradient(180deg, #ff003c, #a855f7, #00f0ff, #ff9900, #ff003c);
+  background-size: 100% 400%;
+  animation: gradientShiftV 8s linear infinite;
+  border-radius: 4px 4px 0 0;
+  transform-origin: bottom;
+  transition: opacity 0.3s ease;
+}
+
+.activityCol:hover .activityBar {
+  opacity: 0.8;
+}
+
+@keyframes gradientShiftV {
+  0% { background-position: 50% 0%; }
+  100% { background-position: 50% 400%; }
+}
+
+.activityHours {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-paper);
+}
+
+.activityDay {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-ash-mist);
+  text-transform: uppercase;
+}
+
+/* ——— Mini Stats ——— */
+
+.miniStats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-40);
+  padding-top: var(--spacing-12);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.miniStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.miniStatValue {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-paper);
+  font-weight: 700;
+}
+
+.miniStatLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-ash-mist);
+  text-transform: uppercase;
+}
+
+/* ——— Loading ——— */
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-48) 0;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-circuit-teal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .langRow {
+    grid-template-columns: 80px 1fr 56px 40px;
+    gap: 8px;
+  }
+}

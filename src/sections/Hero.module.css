@@ -1,0 +1,53 @@
+.hero {
+  position: relative;
+  width: 100vw;
+  min-height: 110vh;
+  overflow: hidden;
+  background-color: var(--color-canvas-dark);
+}
+
+.canvasBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
+
+.contentOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.titleMain {
+  font-family: var(--font-playfair);
+  font-size: clamp(4rem, 10vw, 11rem);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--color-paper);
+  text-align: center;
+  mix-blend-mode: difference;
+}
+
+.role {
+  font-family: var(--font-playfair);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--color-ash-mist);
+  margin-top: var(--spacing-28);
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}

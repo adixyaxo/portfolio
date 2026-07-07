@@ -1,0 +1,145 @@
+.experience {
+  position: relative;
+}
+
+.container {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 4fr 50px;
+  align-items: stretch;
+  padding: var(--spacing-64) var(--spacing-28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.4s ease;
+  background-color: var(--color-inkstone);
+  position: relative;
+}
+
+.row:nth-child(even) {
+  background-color: #0c0c0c;
+}
+
+.row:hover {
+  background-color: #1a1a1a;
+}
+
+.row:hover .colArrow {
+  transform: translateX(8px);
+}
+
+.colOrg {
+  padding-right: var(--spacing-28);
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.orgName {
+  font-family: var(--font-roobert);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-paper);
+  margin: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.hoverImageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25vw;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1;
+}
+
+.hoverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.row:hover .orgName {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.row:hover .hoverImageWrapper {
+  opacity: 1;
+  transform: none;
+}
+
+.colDate {
+  padding-right: var(--spacing-28);
+}
+
+.date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-felt-gray);
+}
+
+.colDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding-right: var(--spacing-28);
+}
+
+.roleTitle {
+  font-family: var(--font-playfair);
+  font-size: var(--text-subheading);
+  font-weight: 400;
+  color: var(--color-paper);
+  margin: 0;
+}
+
+.description p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--color-ash-mist);
+  margin: 0;
+  max-width: 90%;
+}
+
+.colArrow {
+  display: flex;
+  justify-content: flex-end;
+  color: var(--color-paper);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@media (max-width: 1024px) {
+  .row {
+    grid-template-columns: 2fr 1fr 3fr 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-28);
+    padding: var(--spacing-40) var(--spacing-28);
+  }
+
+  .colArrow {
+    display: none;
+  }
+}

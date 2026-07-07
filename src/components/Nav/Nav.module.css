@@ -1,0 +1,35 @@
+.logo {
+  position: fixed;
+  top: 28px;
+  left: var(--spacing-48);
+  z-index: 100;
+  mix-blend-mode: difference;
+  font-family: var(--font-playfair);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-paper);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transform: scaleY(1.35);
+  transform-origin: center;
+}
+
+.menuBtn {
+  position: fixed;
+  top: 28px;
+  right: var(--spacing-48);
+  z-index: 100;
+  background: none;
+  border: none;
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  mix-blend-mode: difference;
+  text-transform: uppercase;
+  transform: scaleY(1.35);
+  transform-origin: center;
+  padding: 0;
+}

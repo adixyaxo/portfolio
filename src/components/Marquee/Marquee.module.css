@@ -1,0 +1,24 @@
+.marqueeContainer {
+  width: 100%;
+  overflow: hidden;
+  padding: var(--spacing-40) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--color-inkstone);
+  display: flex;
+  white-space: nowrap;
+}
+
+.marqueeText {
+  display: flex;
+  width: max-content;
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  color: var(--color-felt-gray);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.marqueeText span {
+  padding-right: 50px; /* Gap between duplicates */
+}
