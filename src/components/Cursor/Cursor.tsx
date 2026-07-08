@@ -1,13 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCursor } from '../../hooks/useCursor';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { useIsTouchDevice } from '../../hooks/useIsMobile';
 import styles from './Cursor.module.css';
 
 export const Cursor = () => {
   const { x, y, isHovering, text } = useCursor();
   const prefersReducedMotion = useReducedMotion();
+  const isTouch = useIsTouchDevice();
 
-  if (prefersReducedMotion) return null;
+  if (prefersReducedMotion || isTouch) return null;
 
   return (
     <motion.div

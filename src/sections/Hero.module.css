@@ -50,4 +50,22 @@
   margin-top: var(--spacing-28);
   text-transform: uppercase;
   mix-blend-mode: difference;
+  padding: 0 var(--spacing-12);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 100vh;
+  }
+
+  .titleMain {
+    font-size: clamp(2.5rem, 14vw, 4rem);
+    padding: 0 var(--spacing-12);
+  }
+
+  .role {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
 }

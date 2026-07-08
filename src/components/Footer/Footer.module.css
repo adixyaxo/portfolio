@@ -147,8 +147,31 @@
 }
 
 @media (max-width: 768px) {
+  .heading {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .form {
+    max-width: 100%;
+  }
+
   .content {
     flex-direction: column;
-    gap: var(--spacing-64);
+    gap: var(--spacing-40);
+  }
+
+  .linksBlock {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-8) var(--spacing-28);
+  }
+
+  .bottom {
+    flex-direction: column;
+    gap: var(--spacing-8);
+    align-items: flex-start;
+  }
+
+  .container {
+    padding: 0 var(--spacing-12);
   }
 }

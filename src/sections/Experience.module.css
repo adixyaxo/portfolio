@@ -135,11 +135,27 @@
 @media (max-width: 768px) {
   .row {
     grid-template-columns: 1fr;
-    gap: var(--spacing-28);
-    padding: var(--spacing-40) var(--spacing-28);
+    gap: var(--spacing-12);
+    padding: var(--spacing-28) var(--spacing-12);
   }
 
   .colArrow {
     display: none;
+  }
+
+  .hoverImageWrapper {
+    display: none;
+  }
+
+  .roleTitle {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .colOrg {
+    padding-right: 0;
+  }
+
+  .colDetails {
+    padding-right: 0;
   }
 }

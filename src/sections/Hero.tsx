@@ -21,20 +21,20 @@ export const Hero = () => {
 
   return (
     <section className={styles.hero}>
-      {!isMobile && (
-        <div className={styles.canvasBackground}>
-          <Suspense fallback={null}>
-            <LiquidGradientCanvas
-              colors={['#ff0055', '#0055ff', '#00ffaa', '#ffaa00', '#7700ff']}
-              speed={0.6}
-              scale={0.5}
-              seed={42}
-              contrast={1.2}
-              saturation={1.2}
-            />
-          </Suspense>
-        </div>
-      )}
+      <div className={styles.canvasBackground}>
+        <Suspense fallback={null}>
+          <LiquidGradientCanvas
+            colors={['#ff0055', '#0055ff', '#00ffaa', '#ffaa00', '#7700ff']}
+            speed={0.6}
+            scale={0.5}
+            seed={42}
+            contrast={1.2}
+            saturation={1.2}
+            maxDpr={isMobile ? 1 : 2}
+            fps={isMobile ? 30 : 0}
+          />
+        </Suspense>
+      </div>
       <div className={styles.contentOverlay}>
         <h1 className={styles.titleMain}>{portfolio.hero.name}</h1>
         <p className={styles.role}>{portfolio.hero.role}</p>

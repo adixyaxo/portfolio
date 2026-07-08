@@ -73,7 +73,12 @@ body {
 
 * {
   box-sizing: border-box;
-  cursor: none !important;
+}
+
+@media (hover: hover) {
+  * {
+    cursor: none !important;
+  }
 }
 
 a {

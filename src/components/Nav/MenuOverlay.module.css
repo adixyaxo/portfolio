@@ -95,3 +95,18 @@
 .socials a:hover {
   color: var(--color-circuit-teal);
 }
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-12);
+  }
+
+  .navLinks a {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  .socials {
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+  }
+}
