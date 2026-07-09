@@ -146,6 +146,28 @@
   margin: 0;
 }
 
+.cvBtn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-paper);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.cvBtn:hover {
+  background: var(--color-circuit-teal);
+  border-color: var(--color-circuit-teal);
+  color: var(--color-canvas-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.2);
+}
+
 @media (max-width: 768px) {
   .heading {
     font-size: clamp(2rem, 8vw, 3rem);

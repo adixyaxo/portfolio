@@ -41,6 +41,29 @@ const LANG_COLORS: Record<string, string> = {
   Other: '#666666',
 };
 
+/* ── In-memory cache ───────────────────────────────────────────── */
+let cachedData: WakaTimeData | null = null;
+let cacheTime = 0;
+const CACHE_TTL = 60_000; // 1 minute
+
+/* ── Safe fetch with timeout ───────────────────────────────────── */
+async function safeFetch(
+  url: string,
+  opts?: RequestInit,
+  timeoutMs = 8_000
+): Promise<Response | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...opts, signal: controller.signal });
+    return res;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function getApiKey(): string | null {
   return process.env.WAKATIME_API_KEY ?? process.env.VITE_WAKATIME_API_KEY ?? null;
 }
@@ -72,28 +95,28 @@ async function fetchWithApiKey(): Promise<WakaTimeData | null> {
 
   const headers = { Authorization: authHeader(apiKey) };
 
-  const statsRes = await fetch(
+  const statsRes = await safeFetch(
     'https://wakatime.com/api/v1/users/current/stats/last_7_days',
     { headers }
   );
 
-  if (!statsRes.ok) {
-    // Try query-param auth as documented fallback
-    const altRes = await fetch(
-      `https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key=${encodeURIComponent(apiKey)}`
-    );
-    if (!altRes.ok) {
+  if (!statsRes || !statsRes.ok) {
+    if (statsRes) {
+      // Try query-param auth as documented fallback
+      const altRes = await safeFetch(
+        `https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key=${encodeURIComponent(apiKey)}`
+      );
+      if (altRes?.ok) {
+        const altJson = (await altRes.json()) as { data: Record<string, unknown> };
+        return buildApiResult(altJson.data, 'Last 7 days');
+      }
       if (statsRes.status === 401) {
         console.warn(
           'WakaTime API key rejected — regenerate at wakatime.com/settings/api-key. Using public profile fallback.'
         );
-      } else {
-        console.error('WakaTime stats failed:', statsRes.status, await statsRes.text());
       }
-      return null;
     }
-    const altJson = (await altRes.json()) as { data: Record<string, unknown> };
-    return buildApiResult(altJson.data, 'Last 7 days');
+    return null;
   }
 
   const statsJson = (await statsRes.json()) as { data: Record<string, unknown> };
@@ -117,12 +140,12 @@ async function buildApiResult(
       const fmt = (d: Date) => d.toISOString().split('T')[0];
       const headers = { Authorization: authHeader(apiKey) };
 
-      const sumRes = await fetch(
+      const sumRes = await safeFetch(
         `https://wakatime.com/api/v1/users/current/summaries?start=${fmt(start)}&end=${fmt(end)}`,
         { headers }
       );
 
-      if (sumRes.ok) {
+      if (sumRes?.ok) {
         const sumJson = (await sumRes.json()) as {
           data: Array<{ range: { date: string }; grand_total?: { total_seconds?: number } }>;
         };
@@ -142,12 +165,11 @@ async function buildApiResult(
 
 async function fetchPublicProfile(): Promise<WakaTimeData | null> {
   const username = getUsername();
-  const res = await fetch(
+  const res = await safeFetch(
     `https://wakatime.com/api/v1/users/${encodeURIComponent(username)}/stats/all_time`
   );
 
-  if (!res.ok) {
-    console.error('WakaTime public profile failed:', res.status);
+  if (!res || !res.ok) {
     return null;
   }
 
@@ -164,11 +186,29 @@ async function fetchPublicProfile(): Promise<WakaTimeData | null> {
 }
 
 export async function fetchWakaTimeStats(): Promise<WakaTimeData | null> {
-  const fromApi = await fetchWithApiKey();
-  if (fromApi) return fromApi;
+  // Return cached data if fresh
+  if (cachedData && Date.now() - cacheTime < CACHE_TTL) {
+    return cachedData;
+  }
 
-  const fromPublic = await fetchPublicProfile();
-  if (fromPublic) return fromPublic;
+  try {
+    const fromApi = await fetchWithApiKey();
+    if (fromApi) {
+      cachedData = fromApi;
+      cacheTime = Date.now();
+      return fromApi;
+    }
+
+    const fromPublic = await fetchPublicProfile();
+    if (fromPublic) {
+      cachedData = fromPublic;
+      cacheTime = Date.now();
+      return fromPublic;
+    }
+  } catch (err) {
+    console.warn('WakaTime fetch failed (network timeout), using cached/null:', (err as Error).message);
+    if (cachedData) return cachedData;
+  }
 
   return null;
 }

@@ -3,6 +3,7 @@ export interface Project {
   link: string;
   tags: string[];
   description: string[];
+  video?: 'sera' | 'xncu';
 }
 
 export interface Writing {
@@ -89,7 +90,8 @@ export const portfolio: PortfolioData = {
         "Designed a custom CSV-based storage engine in place of a traditional database, improving read/write throughput for low-latency feed generation.",
         "Implemented SHA-256 password hashing and JWT-based session management, improving authentication security across all campus-restricted endpoints.",
         "Delivered a real-time-like feed with a lightweight vanilla JS frontend, reducing bandwidth consumption significantly over comparable SPA approaches."
-      ]
+      ],
+      video: 'xncu',
     },
     {
       title: "Project Sera — AI-Powered Life OS",
@@ -100,7 +102,8 @@ export const portfolio: PortfolioData = {
         "Integrating Google's Gemini API to drive context-aware scheduling and predictive workflow automation, improving planning efficiency.",
         "Designing a high-performance RESTful API to manage complex application state and real-time data synchronization.",
         "Building a responsive React frontend optimized for low latency and seamless user interaction."
-      ]
+      ],
+      video: 'sera',
     }
   ],
   writing: [

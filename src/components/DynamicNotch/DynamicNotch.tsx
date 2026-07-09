@@ -1,217 +1,321 @@
-import { memo, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
-import clsx from 'clsx';
-import { useSpotifyNowPlaying } from '../../hooks/useSpotifyNowPlaying';
+import { memo, useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { AudioVisualizer } from './AudioVisualizer';
-import { GrainOverlay } from '../GrainOverlay/GrainOverlay';
+import { useWeather } from '../../hooks/useWeather';
 import styles from './DynamicNotch.module.css';
 
-function formatTime(ms: number): string {
-  const totalSec = Math.floor(ms / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${min}:${sec.toString().padStart(2, '0')}`;
-}
+type PanelType = 'spotify' | 'weather' | 'clock' | 'github';
+const PANELS: PanelType[] = ['spotify', 'weather', 'clock', 'github'];
+const AUTO_ROTATE_MS = 15_000;
+const SWIPE_THRESHOLD = 40;
 
-export const DynamicNotch = memo(function DynamicNotch() {
-  const { track, loading, progressMs, progressPercent } = useSpotifyNowPlaying();
-  const prefersReducedMotion = useReducedMotion();
-  const [expanded, setExpanded] = useState(false);
+/* ── Clock Panel ─────────────────────────────────────────────── */
+function ClockPanel() {
+  const [now, setNow] = useState(new Date());
 
-  const toggleExpanded = useCallback(() => {
-    setExpanded((prev) => !prev);
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
   }, []);
 
-  const openSpotify = useCallback(() => {
-    if (track?.trackUrl) {
-      window.open(track.trackUrl, '_blank', 'noopener,noreferrer');
+  const timeStr = now.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const dateStr = now.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
+
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop()?.replace(/_/g, ' ') || 'Local';
+
+  return (
+    <div className={styles.panelContent}>
+      <div className={styles.clockTime}>{timeStr}</div>
+      <div className={styles.clockDate}>{dateStr}</div>
+      <div className={styles.clockTz}>{tz}</div>
+    </div>
+  );
+}
+
+/* ── Weather Panel ───────────────────────────────────────────── */
+function WeatherPanel() {
+  const { weather, loading } = useWeather();
+
+  if (loading || !weather) {
+    return (
+      <div className={styles.panelContent}>
+        <span className={styles.panelLabel}>WEATHER</span>
+        <span className={styles.panelMuted}>Loading…</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.panelContent}>
+      <div className={styles.weatherRow}>
+        <span className={styles.weatherIcon}>{weather.icon}</span>
+        <span className={styles.weatherTemp}>{weather.temperature}°C</span>
+      </div>
+      <div className={styles.weatherCondition}>{weather.condition}</div>
+      <div className={styles.weatherCity}>{weather.city}</div>
+    </div>
+  );
+}
+
+/* ── GitHub Panel ────────────────────────────────────────────── */
+interface GitHubEvent {
+  type: string;
+  repo: string;
+  time: string;
+  message?: string;
+}
+
+function useGitHub() {
+  const [event, setEvent] = useState<GitHubEvent | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGH() {
+      try {
+        const res = await fetch('https://api.github.com/users/adixyaxo/events/public?per_page=5');
+        if (!res.ok) return;
+        const events = await res.json();
+        const pushEvent = events.find((e: Record<string, unknown>) => e.type === 'PushEvent');
+        if (pushEvent) {
+          const commits = (pushEvent.payload as Record<string, unknown>).commits as Array<{ message: string }> | undefined;
+          setEvent({
+            type: 'Push',
+            repo: (pushEvent.repo as { name: string }).name.split('/')[1] || (pushEvent.repo as { name: string }).name,
+            time: new Date(pushEvent.created_at as string).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+            message: commits?.[0]?.message?.split('\n')[0]?.slice(0, 40) || 'Code update',
+          });
+        } else if (events.length > 0) {
+          const e = events[0];
+          setEvent({
+            type: (e.type as string).replace('Event', ''),
+            repo: (e.repo as { name: string }).name.split('/')[1] || (e.repo as { name: string }).name,
+            time: new Date(e.created_at as string).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+          });
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [track?.trackUrl]);
+
+    fetchGH();
+    const interval = setInterval(fetchGH, 300_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { event, loading };
+}
+
+function GitHubPanel() {
+  const { event, loading } = useGitHub();
 
   if (loading) {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.notchIdle}>
-          <span className={styles.spotifyDot} />
-        </div>
+      <div className={styles.panelContent}>
+        <span className={styles.panelLabel}>GITHUB</span>
+        <span className={styles.panelMuted}>Loading…</span>
       </div>
     );
   }
 
-  if (!track) {
+  if (!event) {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.notchIdle} title="Nothing playing on Spotify">
-          <svg className={styles.spotifyIcon} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-          </svg>
-        </div>
+      <div className={styles.panelContent}>
+        <span className={styles.panelLabel}>GITHUB</span>
+        <span className={styles.panelMuted}>No recent activity</span>
       </div>
     );
   }
+
+  return (
+    <div className={styles.panelContent}>
+      <div className={styles.ghHeader}>
+        <span className={styles.ghDot} />
+        <span className={styles.ghType}>{event.type}</span>
+        <span className={styles.ghTime}>{event.time}</span>
+      </div>
+      <div className={styles.ghRepo}>{event.repo}</div>
+      {event.message && <div className={styles.ghMessage}>{event.message}</div>}
+    </div>
+  );
+}
+
+/* ── Spotify Compact ─────────────────────────────────────────── */
+function SpotifyPanel() {
+  return (
+    <div className={styles.panelContent}>
+      <span className={styles.panelLabel}>SPOTIFY</span>
+      <span className={styles.panelMuted}>Now playing</span>
+    </div>
+  );
+}
+
+/* ── Main DynamicNotch ───────────────────────────────────────── */
+export const DynamicNotch = memo(function DynamicNotch() {
+  const prefersReducedMotion = useReducedMotion();
+  const [activePanel, setActivePanel] = useState<PanelType>('spotify');
+  const [swipeDir, setSwipeDir] = useState<1 | -1>(1);
+  const hoveringRef = useRef(false);
+  const autoRotateRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-rotate panels
+  useEffect(() => {
+    autoRotateRef.current = setInterval(() => {
+      if (hoveringRef.current) return;
+      setSwipeDir(1);
+      setActivePanel((prev) => {
+        const idx = PANELS.indexOf(prev);
+        return PANELS[(idx + 1) % PANELS.length];
+      });
+    }, AUTO_ROTATE_MS);
+
+    return () => {
+      if (autoRotateRef.current) clearInterval(autoRotateRef.current);
+    };
+  }, []);
+
+  /* ── Swipe handler for panels ─────────────────────────────── */
+  const handlePanelDragEnd = useCallback((_: unknown, info: PanInfo) => {
+    if (Math.abs(info.offset.x) > SWIPE_THRESHOLD) {
+      const dir = info.offset.x < 0 ? 1 : -1;
+      setSwipeDir(dir);
+      setActivePanel((prev) => {
+        const idx = PANELS.indexOf(prev);
+        const next = idx + dir;
+        if (next < 0) return PANELS[PANELS.length - 1];
+        if (next >= PANELS.length) return PANELS[0];
+        return PANELS[next];
+      });
+    }
+  }, []);
 
   const spring = prefersReducedMotion
     ? { duration: 0.2 }
     : { type: 'spring' as const, stiffness: 420, damping: 32, mass: 0.8 };
 
+  const isSpotify = activePanel === 'spotify';
+
+  // Slide animation variants
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 60 : -60,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -60 : 60,
+      opacity: 0,
+    }),
+  };
+
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={styles.wrapper}
+      onMouseEnter={() => { hoveringRef.current = true; }}
+      onMouseLeave={() => { hoveringRef.current = false; }}
+    >
+      {/* ── Notch body ───────────────────────────────────── */}
       <motion.div
-        className={clsx(styles.notch, expanded && styles.notchExpanded)}
-        layout
+        className={styles.notch}
         transition={spring}
-        onClick={toggleExpanded}
-        role="button"
-        tabIndex={0}
-        aria-expanded={expanded}
-        aria-label={`Now playing: ${track.title} by ${track.artist}`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleExpanded();
-          }
-        }}
       >
-        <div
-          className={styles.glow}
-          style={{
-            backgroundImage: track.albumArtUrl
-              ? `url(${track.albumArtUrl})`
-              : undefined,
-          }}
-          aria-hidden="true"
+        <motion.div
+          className={styles.dragOverlay}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.15}
+          onDragEnd={handlePanelDragEnd}
+          whileDrag={{ scale: 0.97 }}
+          style={{ touchAction: 'pan-y' }}
         />
 
-        <AnimatePresence mode="wait" initial={false}>
-          {!expanded ? (
+        <AnimatePresence mode="wait" initial={false} custom={swipeDir}>
+          {/* ── SPOTIFY COMPACT ──────────────────────────── */}
+          {isSpotify && (
             <motion.div
-              key="compact"
+              key="spotify"
+              custom={swipeDir}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
               className={styles.compactContent}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
             >
-              <div className={styles.albumThumb}>
-                {track.albumArtUrl ? (
-                  <img src={track.albumArtUrl} alt="" className={styles.albumImg} />
-                ) : (
-                  <span className={styles.albumFallback} />
-                )}
-                <GrainOverlay intensity="light" />
-              </div>
-              <span className={styles.trackTitle}>
-                {track.isRecent ? `↺ ${track.title}` : track.title}
-              </span>
-              <AudioVisualizer active={track.isPlaying} size="sm" />
+              <SpotifyPanel />
             </motion.div>
-          ) : (
+          )}
+
+          {/* ── WEATHER PANEL ────────────────────────────── */}
+          {activePanel === 'weather' && (
             <motion.div
-              key="expanded"
-              className={styles.expandedContent}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              key="weather"
+              custom={swipeDir}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className={styles.compactContent}
             >
-              <div className={styles.playerRow}>
-                <div className={styles.albumLarge}>
-                  {track.albumArtUrl ? (
-                    <img src={track.albumArtUrl} alt="" className={styles.albumImg} />
-                  ) : (
-                    <span className={styles.albumFallback} />
-                  )}
-                </div>
+              <WeatherPanel />
+            </motion.div>
+          )}
 
-                <div className={styles.trackInfo}>
-                  <h3 className={styles.expandedTitle}>{track.title}</h3>
-                  <p className={styles.expandedArtist}>
-                    {track.isRecent ? `Last played · ${track.artist}` : track.artist}
-                  </p>
-                  <p className={styles.expandedAlbum}>{track.album}</p>
+          {/* ── CLOCK PANEL ──────────────────────────────── */}
+          {activePanel === 'clock' && (
+            <motion.div
+              key="clock"
+              custom={swipeDir}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className={styles.compactContent}
+            >
+              <ClockPanel />
+            </motion.div>
+          )}
 
-                  <div className={styles.progressRow}>
-                    <div className={styles.progressTrack}>
-                      <motion.div
-                        className={styles.progressFill}
-                        style={{ width: `${progressPercent}%` }}
-                        layout
-                      />
-                    </div>
-                    <div className={styles.timeLabels}>
-                      <span>{formatTime(progressMs)}</span>
-                      <span>{formatTime(track.durationMs)}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.controls}>
-                    <button
-                      type="button"
-                      className={styles.controlBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openSpotify();
-                      }}
-                      aria-label="Open in Spotify"
-                    >
-                      <SkipBack size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      className={clsx(styles.controlBtn, styles.controlBtnPrimary)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openSpotify();
-                      }}
-                      aria-label={track.isPlaying ? 'Pause in Spotify' : 'Play in Spotify'}
-                    >
-                      {track.isPlaying ? <Pause size={18} /> : <Play size={18} />}
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.controlBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openSpotify();
-                      }}
-                      aria-label="Next in Spotify"
-                    >
-                      <SkipForward size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.spotifyLink}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openSpotify();
-                      }}
-                      aria-label="Open track in Spotify"
-                    >
-                      <ExternalLink size={14} />
-                    </button>
-                    <AudioVisualizer active={track.isPlaying} size="md" />
-                  </div>
-                </div>
-              </div>
-
-              {track.isDemo && (
-                <p className={styles.demoHint}>
-                  Run npm run spotify:setup to show your live playback
-                </p>
-              )}
+          {/* ── GITHUB PANEL ─────────────────────────────── */}
+          {activePanel === 'github' && (
+            <motion.div
+              key="github"
+              custom={swipeDir}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className={styles.compactContent}
+            >
+              <GitHubPanel />
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
-      <div className={styles.dots} aria-hidden="true">
-        <span className={clsx(styles.dot, styles.dotActive)} />
-        <span className={styles.dot} />
-        <span className={styles.dot} />
-        <span className={styles.dot} />
-      </div>
     </div>
   );
 });

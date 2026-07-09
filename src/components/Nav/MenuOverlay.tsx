@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { portfolio } from '../../data/portfolio';
 import styles from './MenuOverlay.module.css';
@@ -26,14 +27,17 @@ export const MenuOverlay: React.FC<MenuOverlayProps> = ({ isOpen, onClose }) => 
                 CLOSE
               </button>
             </div>
-            
+
             <div className={styles.content}>
               <nav className={styles.navLinks}>
-                <motion.a href="#work" onClick={onClose} whileHover={{ x: 20 }}>WORK</motion.a>
-                <motion.a href="#about" onClick={onClose} whileHover={{ x: 20 }}>ABOUT</motion.a>
-                <motion.a href="#contact" onClick={onClose} whileHover={{ x: 20 }}>CONTACT</motion.a>
+                <motion.a href="/#work" onClick={onClose} whileHover={{ x: 20 }}>WORK</motion.a>
+                <motion.a href="/#about" onClick={onClose} whileHover={{ x: 20 }}>ABOUT</motion.a>
+                <motion.a href="/#contact" onClick={onClose} whileHover={{ x: 20 }}>CONTACT</motion.a>
+                <motion.div whileHover={{ x: 20 }}>
+                  <Link to="/cv" onClick={onClose} className={styles.cvLink}>CV</Link>
+                </motion.div>
               </nav>
-              
+
               <div className={styles.socials}>
                 <p className={styles.socialsLabel}>SOCIALS</p>
                 {portfolio.socials.map((social) => (

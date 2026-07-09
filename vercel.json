@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/api/spotify/now-playing", "destination": "/api/spotify/now-playing" },
-    { "source": "/api/wakatime/stats", "destination": "/api/wakatime/stats" }
+    { "source": "/api/wakatime/stats", "destination": "/api/wakatime/stats" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

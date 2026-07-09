@@ -72,6 +72,21 @@
   color: var(--color-circuit-teal);
 }
 
+.cvLink {
+  font-family: var(--font-roobert);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-paper);
+  text-transform: uppercase;
+  text-decoration: none;
+  display: block;
+}
+
+.cvLink:hover {
+  color: var(--color-circuit-teal);
+}
+
 .socials {
   display: flex;
   gap: var(--spacing-28);

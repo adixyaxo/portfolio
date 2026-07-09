@@ -52,6 +52,29 @@ interface SpotifyCurrentlyPlayingResponse {
   } | null;
 }
 
+/* ── In-memory cache ───────────────────────────────────────────── */
+let cachedResult: { track: SpotifyTrack | null; configured: boolean } | null = null;
+let cacheTime = 0;
+const CACHE_TTL = 10_000; // 10 seconds
+
+/* ── Safe fetch with timeout ───────────────────────────────────── */
+async function safeFetch(
+  url: string,
+  opts?: RequestInit,
+  timeoutMs = 8_000
+): Promise<Response | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...opts, signal: controller.signal });
+    return res;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function getClientCredentials(): { clientId: string; clientSecret: string } | null {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -99,7 +122,7 @@ export async function exchangeSpotifyCode(
     client_id: creds.clientId,
   });
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await safeFetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -108,8 +131,8 @@ export async function exchangeSpotifyCode(
     body,
   });
 
-  if (!res.ok) {
-    throw new Error(`Token exchange failed: ${res.status} ${await res.text()}`);
+  if (!res || !res.ok) {
+    throw new Error(`Token exchange failed: ${res?.status ?? 'timeout'}`);
   }
 
   return res.json() as Promise<SpotifyTokenResponse>;
@@ -126,7 +149,7 @@ async function getAccessToken(): Promise<string | null> {
     refresh_token: refreshToken,
   });
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await safeFetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -135,8 +158,7 @@ async function getAccessToken(): Promise<string | null> {
     body,
   });
 
-  if (!res.ok) {
-    console.error('Spotify token refresh failed:', res.status, await res.text());
+  if (!res || !res.ok) {
     return null;
   }
 
@@ -187,12 +209,12 @@ function mapTrack(
 }
 
 async function fetchRecentlyPlayed(accessToken: string): Promise<SpotifyTrack | null> {
-  const res = await fetch(
+  const res = await safeFetch(
     'https://api.spotify.com/v1/me/player/recently-played?limit=1',
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
-  if (!res.ok) return null;
+  if (!res || !res.ok) return null;
 
   const data = (await res.json()) as SpotifyRecentlyPlayedResponse;
   const recent = data.items?.[0];
@@ -205,6 +227,11 @@ export async function getNowPlaying(_req?: IncomingMessage): Promise<{
   track: SpotifyTrack | null;
   configured: boolean;
 }> {
+  // Return cached result if fresh
+  if (cachedResult && Date.now() - cacheTime < CACHE_TTL) {
+    return cachedResult;
+  }
+
   const creds = getClientCredentials();
   const refreshToken = getOwnerRefreshToken();
 
@@ -216,38 +243,53 @@ export async function getNowPlaying(_req?: IncomingMessage): Promise<{
     return { track: DEMO_TRACK, configured: true };
   }
 
-  const accessToken = await getAccessToken();
-  if (!accessToken) {
+  try {
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      return { track: DEMO_TRACK, configured: true };
+    }
+
+    const res = await safeFetch(
+      'https://api.spotify.com/v1/me/player/currently-playing',
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    if (res && res.status === 200) {
+      const data = (await res.json()) as SpotifyCurrentlyPlayingResponse;
+      const track = mapTrack(data.item, data.is_playing, data.progress_ms ?? 0);
+      if (track) {
+        const result = { configured: true, track };
+        cachedResult = result;
+        cacheTime = Date.now();
+        return result;
+      }
+    }
+
+    if (res && (res.status === 204 || res.status === 404)) {
+      const recent = await fetchRecentlyPlayed(accessToken);
+      if (recent) {
+        const result = { track: recent, configured: true };
+        cachedResult = result;
+        cacheTime = Date.now();
+        return result;
+      }
+      return { track: null, configured: true };
+    }
+
+    if (res && !res.ok) {
+      const recent = await fetchRecentlyPlayed(accessToken);
+      if (recent) return { track: recent, configured: true };
+      return { track: DEMO_TRACK, configured: true };
+    }
+
+    // res is null (timeout) — return demo/cached
+    if (cachedResult) return cachedResult;
+    return { track: DEMO_TRACK, configured: true };
+  } catch (err) {
+    console.warn('Spotify fetch failed (network timeout):', (err as Error).message);
+    if (cachedResult) return cachedResult;
     return { track: DEMO_TRACK, configured: true };
   }
-
-  const res = await fetch(
-    'https://api.spotify.com/v1/me/player/currently-playing',
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
-
-  if (res.status === 200) {
-    const data = (await res.json()) as SpotifyCurrentlyPlayingResponse;
-    const track = mapTrack(data.item, data.is_playing, data.progress_ms ?? 0);
-    if (track) return { configured: true, track };
-  }
-
-  if (res.status === 204 || res.status === 404) {
-    const recent = await fetchRecentlyPlayed(accessToken);
-    if (recent) return { track: recent, configured: true };
-    return { track: null, configured: true };
-  }
-
-  if (!res.ok) {
-    console.error('Spotify now-playing failed:', res.status, await res.text());
-    const recent = await fetchRecentlyPlayed(accessToken);
-    if (recent) return { track: recent, configured: true };
-    return { track: DEMO_TRACK, configured: true };
-  }
-
-  const recent = await fetchRecentlyPlayed(accessToken);
-  if (recent) return { track: recent, configured: true };
-  return { track: null, configured: true };
 }
 
 /** Used only by the local setup script — not exposed to site visitors. */

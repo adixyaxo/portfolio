@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MenuOverlay } from './MenuOverlay';
 import styles from './Nav.module.css';
@@ -37,7 +38,7 @@ export const Nav = () => {
     <>
       {/* Left cluster: logo + status */}
       <div className={styles.leftCluster}>
-        <a href="#" className={styles.logo}>@ADIXYAXO</a>
+        <Link to="/cv" className={styles.logo}>@ADIXYAXO</Link>
         <span className={styles.statusDot} />
         <span className={styles.statusText}>AVAILABLE</span>
       </div>

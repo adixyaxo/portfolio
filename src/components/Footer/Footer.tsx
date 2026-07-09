@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { portfolio } from '../../data/portfolio';
 import styles from './Footer.module.css';
 
@@ -45,6 +46,9 @@ export const Footer = () => {
         
         <div className={styles.bottom}>
           <p>© {new Date().getFullYear()} ADITYA DAGAR. ALL RIGHTS RESERVED.</p>
+          <Link to="/cv" className={styles.cvBtn} data-cursor="CV">
+            VIEW CV →
+          </Link>
         </div>
       </div>
     </footer>

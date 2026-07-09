@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLenis } from './hooks/useLenis';
 import { useIsMobile } from './hooks/useIsMobile';
@@ -19,6 +20,7 @@ const Experience = lazy(() => import('./sections/Experience').then((m) => ({ def
 const Skills = lazy(() => import('./sections/Skills').then((m) => ({ default: m.Skills })));
 const Education = lazy(() => import('./sections/Education').then((m) => ({ default: m.Education })));
 const Contact = lazy(() => import('./sections/Contact').then((m) => ({ default: m.Contact })));
+const CVPage = lazy(() => import('./sections/CVPage'));
 
 const FadeIn = ({ children }: { children: React.ReactNode }) => (
   <motion.div
@@ -33,13 +35,11 @@ const FadeIn = ({ children }: { children: React.ReactNode }) => (
 
 const SectionFallback = () => <div style={{ minHeight: '40vh' }} aria-hidden="true" />;
 
-function App() {
-  useLenis();
+function PortfolioPage() {
   const isMobile = useIsMobile();
 
   return (
     <>
-      {!isMobile && <Cursor />}
       <Nav />
       <DynamicNotch />
       {isMobile && <MobileNav />}
@@ -57,6 +57,24 @@ function App() {
           <FadeIn><Contact /></FadeIn>
         </Suspense>
       </main>
+    </>
+  );
+}
+
+function App() {
+  useLenis();
+  const isMobile = useIsMobile();
+
+  return (
+    <>
+      {/* Cursor is rendered at App level so it works on all routes */}
+      {!isMobile && <Cursor />}
+      <Suspense fallback={<SectionFallback />}>
+        <Routes>
+          <Route path="/" element={<PortfolioPage />} />
+          <Route path="/cv" element={<CVPage />} />
+        </Routes>
+      </Suspense>
     </>
   );
 }
