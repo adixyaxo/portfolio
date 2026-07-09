@@ -1,4 +1,4 @@
-import { getNowPlaying } from '../../server/spotify';
+import { getNowPlaying } from '../../server/spotify.js';
 
 export default async function handler(
   req: { method?: string },

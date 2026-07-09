@@ -1,12 +1,9 @@
-import { fetchWakaTimeStats } from '../../server/wakatime';
-
+import { fetchWakaTimeStats } from '../../server/wakatime.js';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 export default async function handler(
-  req: { method?: string },
-  res: {
-    setHeader: (key: string, value: string) => void;
-    status: (code: number) => { json: (body: unknown) => void };
-  }
-) {
+  req: VercelRequest,
+  res: VercelResponse
+){
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
 
