@@ -55,7 +55,7 @@
 
 .articleTitle {
   font-family: var(--font-roobert);
-  font-size: var(--text-heading-sm);
+  font-size: 3vw;
   line-height: var(--leading-heading-sm);
   font-weight: 400;
   margin: 0 0 var(--spacing-28) 0;
