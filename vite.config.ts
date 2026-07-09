@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
   process.env.SPOTIFY_CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
   process.env.SPOTIFY_REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
   process.env.SPOTIFY_REDIRECT_URI = env.SPOTIFY_REDIRECT_URI;
-  process.env.WAKATIME_API_KEY = env.WAKATIME_API_KEY ?? env.VITE_WAKATIME_API_KEY;
+  process.env.WAKATIME_API_KEY = env.WAKATIME_API_KEY ?? env.WAKATIME_API_KEY;
   process.env.WAKATIME_USERNAME = env.WAKATIME_USERNAME;
 
   return {

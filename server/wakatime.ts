@@ -1,3 +1,5 @@
+process.env.WAKATIME_API_KEY
+
 export interface WakaLang {
   name: string;
   percent: number;
@@ -65,7 +67,7 @@ async function safeFetch(
 }
 
 function getApiKey(): string | null {
-  return process.env.WAKATIME_API_KEY ?? process.env.VITE_WAKATIME_API_KEY ?? null;
+  return process.env.WAKATIME_API_KEY ?? process.env.WAKATIME_API_KEY ?? null;
 }
 
 function getUsername(): string {
