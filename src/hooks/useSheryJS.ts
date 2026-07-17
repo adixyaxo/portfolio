@@ -11,8 +11,10 @@ export function useSheryJS() {
   const [shery, setShery] = useState<any>(null);
 
   useEffect(() => {
-    if (isLoaded && window.Shery) {
-      setShery(window.Shery);
+    const sheryWindow = window as Window & { Shery?: unknown };
+
+    if (isLoaded && sheryWindow.Shery) {
+      setShery(sheryWindow.Shery);
       return;
     }
 
@@ -32,8 +34,8 @@ export function useSheryJS() {
         script.async = true;
         script.onload = () => {
           isLoaded = true;
-          // @ts-ignore
-          resolve(window.Shery);
+          const sheryWindow = window as Window & { Shery?: unknown };
+          resolve(sheryWindow.Shery);
         };
         document.body.appendChild(script);
       });

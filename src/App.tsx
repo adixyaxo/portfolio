@@ -56,11 +56,15 @@ function useSheryMagnet() {
         // @ts-ignore
         window.ScrollTrigger = ScrollTrigger;
 
-        const sheryModule = await import('sheryjs/dist/Shery.js');
-        const Shery = sheryModule.default || sheryModule.Shery || sheryModule;
+        const sheryModule = (await import('sheryjs/dist/Shery.js')) as {
+          default?: unknown;
+          Shery?: unknown;
+        };
+        const Shery = sheryModule.default ?? sheryModule.Shery ?? sheryModule;
+        const sheryApi = Shery as { makeMagnet?: (selector: string, options: Record<string, unknown>) => void };
 
-        if (Shery && typeof Shery.makeMagnet === 'function') {
-          Shery.makeMagnet('.magnet', {
+        if (sheryApi.makeMagnet) {
+          sheryApi.makeMagnet('.magnet', {
             ease: 'cubic-bezier(0.23, 1, 0.320, 1)',
             duration: 1,
           });
