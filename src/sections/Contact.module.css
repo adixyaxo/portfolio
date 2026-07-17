@@ -19,6 +19,21 @@
   z-index: 10;
 }
 
+/* Let mouse events pass through to the canvas gradient below,
+   but keep interactive children clickable */
+.footerWrapper {
+  pointer-events: none;
+}
+
+.footerWrapper a,
+.footerWrapper button,
+.footerWrapper input,
+.footerWrapper textarea,
+.footerWrapper [role="button"],
+.footerWrapper label {
+  pointer-events: auto;
+}
+
 .container {
   max-width: var(--page-max-width);
   margin: 0 auto;

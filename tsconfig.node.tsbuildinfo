@@ -1,1 +1,1 @@
-{"root":["./vite.config.ts","./server/spotify.ts","./server/utils.ts","./server/wakatime.ts","./api/spotify/now-playing.ts","./api/wakatime/stats.ts","./scripts/spotify-setup.ts"],"version":"5.9.3"}
+{"root":["./vite.config.ts","./server/node-env.d.ts","./server/spotify.ts","./server/utils.ts","./server/wakatime.ts","./api/spotify/now-playing.ts","./api/wakatime/stats.ts","./scripts/spotify-setup.ts"],"version":"5.9.3"}

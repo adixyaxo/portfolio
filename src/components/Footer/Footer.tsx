@@ -19,7 +19,7 @@ export const Footer = () => {
             <div className={styles.inputGroup}>
               <textarea id="message" rows={4} placeholder="PROJECT DETAILS" required></textarea>
             </div>
-            <button type="submit" className={styles.submitBtn} data-cursor="SEND">SUBMIT</button>
+            <button type="submit" className={`${styles.submitBtn} magnet`} data-cursor="SEND">SUBMIT</button>
           </form>
         </div>
 
@@ -37,6 +37,7 @@ export const Footer = () => {
                 href={social.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
+                className="magnet"
               >
                 {social.platform}
               </a>
@@ -46,7 +47,7 @@ export const Footer = () => {
         
         <div className={styles.bottom}>
           <p>© {new Date().getFullYear()} ADITYA DAGAR. ALL RIGHTS RESERVED.</p>
-          <Link to="/cv" className={styles.cvBtn} data-cursor="CV">
+          <Link to="/cv" className={`${styles.cvBtn} magnet`} data-cursor="CV">
             VIEW CV →
           </Link>
         </div>

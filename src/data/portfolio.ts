@@ -23,6 +23,7 @@ export interface Experience {
   link?: string;
   date: string;
   description: string | string[];
+  image?: string;
 }
 
 export interface SocialLink {
@@ -124,6 +125,7 @@ export const portfolio: PortfolioData = {
       organization: "Aency, Architectural Branding Studio",
       link: "https://aency.lovable.app/",
       date: "Present",
+      image: "/exp/aency.png",
       description: [
         "Founded a premium branding studio delivering brand identity, high-converting websites, and content strategy for high-end interior designers and renovation firms.",
         "Architected and shipped the studio's web presence end-to-end, combining editorial design with performant frontend development."
@@ -134,6 +136,7 @@ export const portfolio: PortfolioData = {
       organization: "Helping Students",
       link: "https://github.com/adixyaxo/Helping-Students",
       date: "Present",
+      image: "/exp/students.png",
       description: [
         "Deliver full-stack academic projects with clean code, modern tech, and proper documentation so students can confidently walk into their viva.",
         "Built the freelancing landing page from scratch using HTML, Tailwind CSS, and vanilla JS with GSAP-powered animations, smooth scroll, and a liquid menu overlay."
@@ -143,6 +146,7 @@ export const portfolio: PortfolioData = {
       role: "Core Member",
       organization: "Google Developer Student Clubs, NCU",
       date: "2025 – Present",
+      image: "/exp/gdsc.png",
       description: [
         "Orchestrated technical workshops and collaborated on community-driven open-source projects, elevating campus technical literacy.",
         "Contributed to university-wide initiatives focusing on full-stack development and modern deployment practices."
@@ -152,12 +156,14 @@ export const portfolio: PortfolioData = {
       role: "Core Team Member",
       organization: "Entrepreneurship Cell (E-Cell), NCU",
       date: "2025 – Present",
+      image: "/exp/ecell.png",
       description: "Coordinated logistics and technical planning for hackathons and startup summits, driving engagement in NCU's entrepreneurial ecosystem."
     },
     {
       role: "Student Coordinator",
       organization: "International Relations Office, NCU",
       date: "2025 – Present",
+      image: "/exp/iro.png",
       description: "Managed cross-cultural coordination and student affairs across international programs, strengthening communication in dynamic academic settings."
     }
   ],

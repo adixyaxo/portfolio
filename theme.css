@@ -89,7 +89,7 @@ a {
 .roundedSection {
   border-radius: 40px;
   margin: var(--spacing-28) var(--spacing-28);
-  overflow: hidden;
+  overflow: clip; /* Changed from hidden to clip to preserve GSAP ScrollTrigger bounds */
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -99,4 +99,10 @@ a {
     margin: var(--spacing-12) var(--spacing-12);
     border-radius: 24px;
   }
+}
+
+/* SheryJS Overrides */
+._canvas_container {
+  z-index: 9999 !important;
+  pointer-events: none;
 }

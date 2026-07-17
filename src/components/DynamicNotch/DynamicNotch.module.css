@@ -1,3 +1,5 @@
+/* ── Wrapper ─────────────────────────────────────────────────── */
+
 .wrapper {
   position: fixed;
   top: 0;
@@ -10,6 +12,8 @@
   pointer-events: none;
 }
 
+/* ── Notch ───────────────────────────────────────────────────── */
+
 .notch {
   pointer-events: auto;
   cursor: pointer;
@@ -18,33 +22,244 @@
   background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: none;
-  border-radius: 0 0 28px 28px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.6),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-  min-width: 220px;
-  max-width: 320px;
-  /* max-height: 10vh; */
-  padding: 10px 16px 14px;
-  transition: max-width 0.35s ease, padding 0.35s ease;
+  border-radius: 0 0 24px 24px;
+  min-width: 260px;
+  max-width: 360px;
+  padding: 8px 14px 12px;
+  will-change: transform;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.notchExpanded {
+  min-width: 340px;
+  max-width: 420px;
+  padding: 8px 14px 14px;
+  overflow: visible;
+}
+
+/* ── Integrated tab bar inside notch ─────────────────────────── */
+
+.notchTabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 20;
+}
+
+.notchTab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  min-width: 22px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 75px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.notchTab:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.notchTabActive {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-paper);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.notchTabLabel {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── Swipe drag layer ────────────────────────────────────────── */
+
+.swipeLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: grab;
+}
+
+.swipeLayer:active {
+  cursor: grabbing;
+}
+
+/* ── Spotify glow ────────────────────────────────────────────── */
+
+.spotifyGlow {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 50px;
+  background: radial-gradient(ellipse, rgba(29, 185, 84, 0.15) 0%, transparent 70%);
+  filter: blur(16px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.compactContent,
+.expandedContent {
+  position: relative;
+  z-index: 1;
 }
 
 .compactContent {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.dragOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  touch-action: pan-y;
+/* ── Spotify compact row ─────────────────────────────────────── */
+
+.spotifyCompactRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
-/* ── Panel content (shared) ────────────────────────────────────── */
+.spotifyIconSmall {
+  width: 16px;
+  height: 16px;
+  color: #1db954;
+  flex-shrink: 0;
+}
+
+.embedLabel {
+  flex: 1;
+  font-family: var(--font-roobert);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-paper);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.embedCounter {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.embedNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 75px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  z-index: 20;
+}
+
+.embedNavBtn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-paper);
+}
+
+.embedNavBtn:active {
+  transform: scale(0.88);
+}
+
+/* ── Expanded iframe ─────────────────────────────────────────── */
+
+.embedIframeWrap {
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.embedIframe {
+  display: block;
+  border: none;
+  border-radius: 12px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.embedNavRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.embedNavBtnLg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 75px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.embedNavBtnLg:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-paper);
+}
+
+.embedNavBtnLg:active {
+  transform: scale(0.88);
+}
+
+.embedDots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.embedDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 75px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.embedDotActive {
+  width: 14px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Panel content (shared) ──────────────────────────────────── */
 
 .panelContent {
   display: flex;
@@ -69,12 +284,12 @@
   color: rgba(255, 255, 255, 0.25);
 }
 
-/* ── Clock ─────────────────────────────────────────────────────── */
+/* ── Clock ───────────────────────────────────────────────────── */
 
 .clockTime {
   font-family: var(--font-roobert);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-paper);
   letter-spacing: 0.04em;
   line-height: 1;
@@ -98,7 +313,7 @@
   margin-top: 2px;
 }
 
-/* ── Weather ───────────────────────────────────────────────────── */
+/* ── Weather ─────────────────────────────────────────────────── */
 
 .weatherRow {
   display: flex;
@@ -106,15 +321,12 @@
   gap: 8px;
 }
 
-.weatherIcon {
-  font-size: 22px;
-  line-height: 1;
-}
+.weatherIcon { font-size: 22px; line-height: 1; }
 
 .weatherTemp {
   font-family: var(--font-roobert);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-paper);
   line-height: 1;
 }
@@ -137,7 +349,7 @@
   margin-top: 2px;
 }
 
-/* ── GitHub ─────────────────────────────────────────────────────── */
+/* ── GitHub ───────────────────────────────────────────────────── */
 
 .ghHeader {
   display: flex;
@@ -149,10 +361,9 @@
 .ghDot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 75px;
   background: #238636;
   flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(35, 134, 54, 0.5);
 }
 
 .ghType {
@@ -173,7 +384,7 @@
 .ghRepo {
   font-family: var(--font-roobert);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-paper);
   width: 100%;
   text-align: left;
@@ -195,23 +406,49 @@
   margin-top: 2px;
 }
 
-@keyframes breathe {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-}
+/* ── Mobile ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
   .notch {
     min-width: 200px;
-    max-width: calc(100vw - 120px);
-    padding: 8px 12px 12px;
+    max-width: calc(100vw - 80px);
+    padding: 6px 10px 10px;
   }
 
-  .clockTime {
-    font-size: 18px;
+  .notchExpanded {
+    min-width: 260px;
+    max-width: calc(100vw - 32px);
+    padding: 6px 10px 12px;
   }
 
-  .weatherTemp {
-    font-size: 16px;
+  .notchTabs {
+    gap: 3px;
+    margin-bottom: 6px;
+  }
+
+  .notchTab {
+    height: 20px;
+    min-width: 20px;
+    padding: 0 6px;
+  }
+
+  .notchTabLabel {
+    display: none;
+  }
+
+  .embedLabel { font-size: 11px; }
+  .clockTime { font-size: 18px; }
+  .weatherTemp { font-size: 16px; }
+  .embedNavBtn { width: 22px; height: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipeLayer { display: none; }
+
+  .notchTab,
+  .embedNavBtn,
+  .embedNavBtnLg,
+  .embedDot {
+    transition: none;
   }
 }

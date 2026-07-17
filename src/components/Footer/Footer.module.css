@@ -67,11 +67,13 @@
   border-bottom-color: var(--color-circuit-teal);
 }
 
+/* ── Liquid glass submit button ──────────────────────────────── */
+
 .submitBtn {
   align-self: flex-start;
-  background: var(--color-paper);
-  color: var(--color-canvas-dark);
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-paper);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 100px;
   padding: 16px 48px;
   font-family: var(--font-roobert);
@@ -82,13 +84,21 @@
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
   margin-top: var(--spacing-40);
-  box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    0 0 0 rgba(255, 255, 255, 0),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .submitBtn:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.15);
-  background: var(--color-circuit-teal);
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow:
+    0 20px 40px rgba(0, 240, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: var(--color-paper);
 }
 
 .content {
@@ -146,6 +156,8 @@
   margin: 0;
 }
 
+/* ── Liquid glass CV button ──────────────────────────────────── */
+
 .cvBtn {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -155,17 +167,24 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 10px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 100px;
   transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  pointer-events: auto;
 }
 
 .cvBtn:hover {
-  background: var(--color-circuit-teal);
-  border-color: var(--color-circuit-teal);
-  color: var(--color-canvas-dark);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  color: var(--color-paper);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.2);
+  box-shadow:
+    0 8px 24px rgba(0, 240, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -195,5 +214,21 @@
 
   .container {
     padding: 0 var(--spacing-12);
+  }
+
+  /* Disable backdrop-filter on mobile for performance */
+  .submitBtn,
+  .cvBtn {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .submitBtn {
+    background: var(--color-paper);
+    color: var(--color-canvas-dark);
+  }
+
+  .submitBtn:hover {
+    background: var(--color-circuit-teal);
   }
 }

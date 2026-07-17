@@ -1,6 +1,9 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import * as THREE from 'three';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLenis } from './hooks/useLenis';
 import { useIsMobile } from './hooks/useIsMobile';
 import { Cursor } from './components/Cursor/Cursor';
@@ -35,6 +38,42 @@ const FadeIn = ({ children }: { children: React.ReactNode }) => (
 
 const SectionFallback = () => <div style={{ minHeight: '40vh' }} aria-hidden="true" />;
 
+/* ── Initialize SheryJS magnetic effect on all .magnet elements ── */
+function useSheryMagnet() {
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile) return;
+
+    // Delay to ensure DOM is ready after lazy loads
+    const timer = setTimeout(async () => {
+      try {
+        // Expose to window for SheryJS UMD wrapper
+        // @ts-ignore
+        window.THREE = THREE;
+        // @ts-ignore
+        window.gsap = gsap;
+        // @ts-ignore
+        window.ScrollTrigger = ScrollTrigger;
+
+        const sheryModule = await import('sheryjs/dist/Shery.js');
+        const Shery = sheryModule.default || sheryModule.Shery || sheryModule;
+
+        if (Shery && typeof Shery.makeMagnet === 'function') {
+          Shery.makeMagnet('.magnet', {
+            ease: 'cubic-bezier(0.23, 1, 0.320, 1)',
+            duration: 1,
+          });
+        }
+      } catch (e) {
+        console.warn('SheryJS magnet init failed:', e);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isMobile]);
+}
+
 function PortfolioPage() {
   const isMobile = useIsMobile();
 
@@ -63,11 +102,11 @@ function PortfolioPage() {
 
 function App() {
   useLenis();
+  useSheryMagnet();
   const isMobile = useIsMobile();
 
   return (
     <>
-      {/* Cursor is rendered at App level so it works on all routes */}
       {!isMobile && <Cursor />}
       <Suspense fallback={<SectionFallback />}>
         <Routes>

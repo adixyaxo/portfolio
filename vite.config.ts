@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import glsl from 'vite-plugin-glsl';
 import { getNowPlaying } from './server/spotify';
 import { fetchWakaTimeStats } from './server/wakatime';
 
@@ -56,7 +57,17 @@ export default defineConfig(({ mode }) => {
   process.env.WAKATIME_USERNAME = env.WAKATIME_USERNAME;
 
   return {
-    plugins: [react(), apiPlugin()],
+    plugins: [react(), apiPlugin(), glsl()],
+    resolve: {
+      alias: [
+        { find: 'ControlKit', replacement: 'controlkit' },
+        { find: 'THREE', replacement: 'three' },
+      ],
+    },
+    optimizeDeps: {
+      include: ['three', 'gsap', 'controlkit'],
+      exclude: ['sheryjs'],
+    },
     build: {
       rollupOptions: {
         output: {

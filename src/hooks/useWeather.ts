@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface WeatherData {
   temperature: number;
@@ -39,8 +39,15 @@ const DEFAULT_LON = 77.0266;
 export function useWeather() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
+  // Cache resolved coordinates so refresh intervals use the correct location
+  const coordsRef = useRef<{ lat: number; lon: number; city: string }>({
+    lat: DEFAULT_LAT,
+    lon: DEFAULT_LON,
+    city: 'Gurugram',
+  });
 
   const fetchWeather = useCallback(async (lat: number, lon: number, city: string) => {
+    if (document.visibilityState === 'hidden') return;
     try {
       const res = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&timezone=auto`
@@ -71,10 +78,16 @@ export function useWeather() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
+          // Cache the resolved coordinates for future refreshes
+          coordsRef.current = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            city: 'Current Location',
+          };
           fetchWeather(pos.coords.latitude, pos.coords.longitude, 'Current Location');
         },
         () => {
-          // Fallback to Delhi
+          // Fallback to default
           fetchWeather(DEFAULT_LAT, DEFAULT_LON, 'Gurugram');
         },
         { timeout: 5000 }
@@ -83,9 +96,10 @@ export function useWeather() {
       fetchWeather(DEFAULT_LAT, DEFAULT_LON, 'Gurugram');
     }
 
-    // Refresh every 10 minutes
+    // Refresh every 10 minutes — using cached coordinates
     const interval = setInterval(() => {
-      fetchWeather(DEFAULT_LAT, DEFAULT_LON, 'Gurugram');
+      const { lat, lon, city } = coordsRef.current;
+      fetchWeather(lat, lon, city);
     }, 600_000);
 
     return () => clearInterval(interval);

@@ -13,7 +13,7 @@ export const Cursor = () => {
 
   return (
     <motion.div
-      className={styles.cursorWrapper}
+      className={`${styles.cursorWrapper} ${isHovering ? styles.glass : ''}`}
       style={{
         left: x,
         top: y,
@@ -22,7 +22,9 @@ export const Cursor = () => {
       animate={{
         width: isHovering ? 64 : 12,
         height: isHovering ? 64 : 12,
-        backgroundColor: 'var(--color-circuit-teal)',
+        backgroundColor: isHovering
+          ? 'rgba(0, 240, 255, 0.06)'
+          : 'var(--color-circuit-teal)',
         mixBlendMode: 'normal',
       }}
       transition={{
@@ -32,7 +34,6 @@ export const Cursor = () => {
         mass: 0.1,
       }}
     >
-
       <AnimatePresence>
         {isHovering && text && (
           <motion.span

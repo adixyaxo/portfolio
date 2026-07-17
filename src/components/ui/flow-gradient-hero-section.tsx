@@ -176,6 +176,7 @@ class App {
   renderer: any; camera: any; scene: any; lastTime: number = 0;
   touchTexture: TouchTexture; gradientBackground: GradientBackground;
   animationId: number | null = null; container: HTMLElement;
+  handleMouseMove: any; handleTouchMove: any; handleResize: any;
   constructor(container: HTMLElement) {
     this.container = container;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -202,18 +203,37 @@ class App {
   init() {
     this.gradientBackground.init();
     const c = this.container;
-    const onMove = (x: number, y: number) => { this.touchTexture.addTouch({ x: x / c.clientWidth, y: 1 - y / c.clientHeight }); };
-    c.addEventListener("mousemove", (e) => onMove(e.offsetX, e.offsetY));
-    c.addEventListener("touchmove", (e) => {
+    
+    // Use an arrow function property for the event listener so it can be removed during cleanup
+    this.handleMouseMove = (e: MouseEvent) => {
       const rect = c.getBoundingClientRect();
-      onMove(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-    });
-    window.addEventListener("resize", () => {
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      // Only register touches if the cursor is near or inside the section
+      if (x > -100 && x < c.clientWidth + 100 && y > -100 && y < c.clientHeight + 100) {
+        this.touchTexture.addTouch({ x: x / c.clientWidth, y: 1 - y / c.clientHeight });
+      }
+    };
+
+    this.handleTouchMove = (e: TouchEvent) => {
+      const rect = c.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left;
+      const y = e.touches[0].clientY - rect.top;
+      if (x > -100 && x < c.clientWidth + 100 && y > -100 && y < c.clientHeight + 100) {
+        this.touchTexture.addTouch({ x: x / c.clientWidth, y: 1 - y / c.clientHeight });
+      }
+    };
+
+    window.addEventListener("mousemove", this.handleMouseMove);
+    window.addEventListener("touchmove", this.handleTouchMove);
+    
+    this.handleResize = () => {
       this.camera.aspect = c.clientWidth / c.clientHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(c.clientWidth, c.clientHeight);
       this.gradientBackground.onResize(c.clientWidth, c.clientHeight);
-    });
+    };
+    window.addEventListener("resize", this.handleResize);
     this.tick();
   }
   tick() {
@@ -227,6 +247,11 @@ class App {
   }
   cleanup() { 
     if (this.animationId) cancelAnimationFrame(this.animationId); 
+    
+    if (this.handleMouseMove) window.removeEventListener("mousemove", this.handleMouseMove);
+    if (this.handleTouchMove) window.removeEventListener("touchmove", this.handleTouchMove);
+    if (this.handleResize) window.removeEventListener("resize", this.handleResize);
+    
     this.renderer.dispose(); 
     if (this.container && this.renderer.domElement && this.container.contains(this.renderer.domElement)) {
       this.container.removeChild(this.renderer.domElement);
